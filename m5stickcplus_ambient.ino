@@ -3,6 +3,7 @@
 #include "Ambient.h"
 
 #define ADC_PIN 33
+#define led 10
 
 const char* ssid = "IT-IoT";
 const char* password = "Passw0rd";
@@ -32,6 +33,8 @@ void setup() {
   ambient.begin(channelId, writeKey, &client);
 
   pinMode(ADC_PIN, INPUT);
+  pinMode(led, OUTPUT);
+  
   Serial.begin(115200);
   M5.begin();
   M5.Axp.ScreenBreath(8); //バックライト0~12
@@ -47,7 +50,7 @@ int counter = 0;
 void loop() {
   pressure = qmp6988.calcPressure();
   if (sht30.get() == 0) { //Obtain the data of shT30.  获取sht30的数据
-    tmp = sht30.cTemp;  //Store the temperature obtained from shT30.  将sht30获取到的温度存储
+    tmp = sht30.cTemp - 10.0;  //Store the temperature obtained from shT30.  将sht30获取到的温度存储
     hum = sht30.humidity; //Store the humidity obtained from the SHT30.  将sht30获取到的湿度存储
   } else {
     tmp = 0, hum = 0;
@@ -62,6 +65,12 @@ void loop() {
   }
 
   potential = 100 - map(potential, ADC_MIN, ADC_MAX, 0, 100);
+  if(potential < 5){
+    digitalWrite(led, 1);
+  }
+  else if(potential >= 5){
+    digitalWrite(led, 0);
+  }
   M5.lcd.fillRect(0, 20, 100, 60, BLACK); //Fill the screen with black (to clear the screen).  将屏幕填充黑色(用来清屏)
   M5.lcd.setCursor(0, 20);
   M5.Lcd.printf("Temp: %2.1f  \r\nHumi: %2.0f%%  \r\nPressure:%2.0fPa \r\nMoist:%2d%%", tmp, hum, pressure, potential);
@@ -73,7 +82,7 @@ void loop() {
   delay(2000);
 }
 
-void sendAmbient(float temp, float humid, int puress, int moist) {
+void sendAmbient(float temp, float humid, float puress, int moist) {
   ambient.set(1, temp);
   ambient.set(2, humid);
   ambient.set(3, puress);
