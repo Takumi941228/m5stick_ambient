@@ -2,7 +2,7 @@
 
 ## ENV.Ⅲセンサを使った温湿度・気圧の取得
 
-"""
+'''shell
 SHT3X::SHT3X(uint8_t address)
 {
   Wire.begin();
@@ -13,4 +13,4 @@ SHT3X::SHT3X(uint8_t address)
   #endif
   _address=address;
 }
-"""
+'''
