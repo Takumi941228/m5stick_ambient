@@ -20,8 +20,8 @@ Arduino IDEのメニュー[スケッチ] → [ライブラリをインクルー�
 
 const char* ssid = "IT-IoT";
 const char* password = "Passw0rd";
-const int channelId = 51121;
-const char* writeKey = "646a96c43a8b625d";
+const int channelId = 51171;
+const char* writeKey = "ff5e60199524f0f3";
 
 WiFiClient client;
 Ambient ambient;
@@ -47,13 +47,13 @@ void setup() {
 
   pinMode(ADC_PIN, INPUT);
   pinMode(led, OUTPUT);
-  
+
   Serial.begin(115200);
   M5.begin();
   M5.Axp.ScreenBreath(8); //バックライト0~12
   M5.Lcd.setRotation(3);
-  M5.lcd.setTextSize(2);  //Set the text size to 2.
-  Wire.begin(); //Wire init, adding the I2C bus.
+  M5.lcd.setTextSize(2);  //Set the text size to 2.  设置文字大小为2
+  Wire.begin(); //Wire init, adding the I2C bus.  Wire初始化, 加入i2c总线
   qmp6988.init();
   M5.lcd.println(F("Plant Ficus"));
 }
@@ -62,9 +62,9 @@ int counter = 0;
 
 void loop() {
   pressure = qmp6988.calcPressure();
-  if (sht30.get() == 0) { //Obtain the data of shT30.
-    tmp = sht30.cTemp - 10.0;  //Store the temperature obtained from shT30.
-    hum = sht30.humidity; //Store the humidity obtained from the SHT30.
+  if (sht30.get() == 0) { //Obtain the data of shT30.  获取sht30的数据
+    tmp = sht30.cTemp - 10.0;  //Store the temperature obtained from shT30.  将sht30获取到的温度存储
+    hum = sht30.humidity; //Store the humidity obtained from the SHT30.  将sht30获取到的湿度存储
   } else {
     tmp = 0, hum = 0;
   }
@@ -78,21 +78,18 @@ void loop() {
   }
 
   potential = 100 - map(potential, ADC_MIN, ADC_MAX, 0, 100);
-  if(potential < 5){
+  if (potential < 60) {
     digitalWrite(led, 1);
   }
-  else if(potential >= 5){
+  else if (potential >= 60) {
     digitalWrite(led, 0);
   }
-  M5.lcd.fillRect(0, 20, 100, 60, BLACK); //Fill the screen with black (to clear the screen).
+  Serial.println(potential);
+  M5.lcd.fillRect(0, 20, 100, 60, BLACK); //Fill the screen with black (to clear the screen).  将屏幕填充黑色(用来清屏)
   M5.lcd.setCursor(0, 20);
   M5.Lcd.printf("Temp: %2.1f  \r\nHumi: %2.0f%%  \r\nPressure:%2.0fPa \r\nMoist:%2d%%", tmp, hum, pressure, potential);
-
-  if (counter % 6 == 0) {
-    sendAmbient(tmp, hum, pressure, potential);
-  }
-  counter++;
-  delay(2000);
+  sendAmbient(tmp, hum, pressure, potential);
+  delay(1000 * 30);
 }
 
 void sendAmbient(float temp, float humid, float puress, int moist) {

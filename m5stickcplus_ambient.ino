@@ -7,8 +7,8 @@
 
 const char* ssid = "IT-IoT";
 const char* password = "Passw0rd";
-const int channelId = 51121;
-const char* writeKey = "646a96c43a8b625d";
+const int channelId = 51171;
+const char* writeKey = "ff5e60199524f0f3";
 
 WiFiClient client;
 Ambient ambient;
@@ -34,7 +34,7 @@ void setup() {
 
   pinMode(ADC_PIN, INPUT);
   pinMode(led, OUTPUT);
-  
+
   Serial.begin(115200);
   M5.begin();
   M5.Axp.ScreenBreath(8); //バックライト0~12
@@ -65,21 +65,18 @@ void loop() {
   }
 
   potential = 100 - map(potential, ADC_MIN, ADC_MAX, 0, 100);
-  if(potential < 5){
+  if (potential < 60) {
     digitalWrite(led, 1);
   }
-  else if(potential >= 5){
+  else if (potential >= 60) {
     digitalWrite(led, 0);
   }
+  Serial.println(potential);
   M5.lcd.fillRect(0, 20, 100, 60, BLACK); //Fill the screen with black (to clear the screen).  将屏幕填充黑色(用来清屏)
   M5.lcd.setCursor(0, 20);
   M5.Lcd.printf("Temp: %2.1f  \r\nHumi: %2.0f%%  \r\nPressure:%2.0fPa \r\nMoist:%2d%%", tmp, hum, pressure, potential);
-
-  if (counter % 6 == 0) {
-    sendAmbient(tmp, hum, pressure, potential);
-  }
-  counter++;
-  delay(2000);
+  sendAmbient(tmp, hum, pressure, potential);
+  delay(1000 * 30);
 }
 
 void sendAmbient(float temp, float humid, float puress, int moist) {
