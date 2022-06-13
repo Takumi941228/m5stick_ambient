@@ -89,7 +89,7 @@ void loop() {
   M5.lcd.setCursor(0, 20);
   M5.Lcd.printf("Temp: %2.1f  \r\nHumi: %2.0f%%  \r\nPressure:%2.0fPa \r\nMoist:%2d%%", tmp, hum, pressure, potential);
   sendAmbient(tmp, hum, pressure, potential);
-  delay(1000 * 30);
+  delay(1000 * 60);
 }
 
 void sendAmbient(float temp, float humid, float puress, int moist) {
